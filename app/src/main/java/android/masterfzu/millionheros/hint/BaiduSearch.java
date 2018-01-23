@@ -126,23 +126,23 @@ public class BaiduSearch {
             return rsb.toString();
         }
 
-        index = getBigone(r.allsum);
+//        index = getBigone(r.allsum);
+//
+//        for (int i = 0; i < r.sum.length; i++) {
+//            int zeroCount = 0;
+//            System.out.print("单字：");
+//            //rsb.append("单字：");
+//            for (int y = 0; y < r.dumpsum[i].length; y++) {
+//                if (r.dumpsum[i][y] <= 0) {
+//                    zeroCount++;
+//                    continue;
+//                }
+//
+//                System.out.print(qa.getAns()[i].substring(y, y + 1) + ":" + r.dumpsum[i][y] + ", ");
+//                //rsb.append(qa.getAns()[i].substring(y, y + 1) + " : " + r.dumpsum[i][y] + " , ");
+//            }
 
-        for (int i = 0; i < r.sum.length; i++) {
-            int zeroCount = 0;
-            System.out.print("单字：");
-            rsb.append("单字：");
-            for (int y = 0; y < r.dumpsum[i].length; y++) {
-                if (r.dumpsum[i][y] <= 0) {
-                    zeroCount++;
-                    continue;
-                }
-
-                System.out.print(qa.getAns()[i].substring(y, y + 1) + ":" + r.dumpsum[i][y] + ", ");
-                rsb.append(qa.getAns()[i].substring(y, y + 1) + " : " + r.dumpsum[i][y] + " , ");
-            }
-
-            rsb.append(" ### 总和:" + r.allsum[i] + (index == i ? " 最大值！" : ""));
+            // rsb.append(" ### 总和:" + r.allsum[i] + (index == i ? " 最大值！" : ""));
 //            if (zeroCount > 0) {
 //                System.out.print(" \t  未出现:" + zeroCount);
 ////                rsb.append(" ### " + zeroCount + " 个字无匹配:");
@@ -151,15 +151,16 @@ public class BaiduSearch {
 //                rsb.append(" ### 总和:" + r.allsum[i] + (index == i ? " 最大值！" : ""));
 //            }
 
-            System.out.println();
-            rsb.append("\n");
-        }
-
-        float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;
-        System.out.println("执行时间：" + excTime + "s");
-        System.out.println("\n");
-
-        return rsb.toString();
+//            System.out.println();
+//            rsb.append("\n");
+//        }
+//
+////        float excTime = (float) (System.currentTimeMillis() - startTime) / 1000;
+////        System.out.println("执行时间：" + excTime + "s");
+////        System.out.println("\n");
+//
+//        return rsb.toString();
+        return "无答案";
     }
 
     private static int getBigone(int[] allsum) {
@@ -178,6 +179,7 @@ public class BaiduSearch {
         return index;
     }
 
+    /**获取汉字*/
     private static String getHanZi(String s) {
         StringBuffer r = new StringBuffer();
         Pattern pattern = Pattern.compile("[^\\x00-\\xff]");
@@ -190,11 +192,11 @@ public class BaiduSearch {
     }
 
     private static int getCount(StringBuffer sb, String des) {
-        des = des.replaceAll("\\?" , ""); //防止出错
+        des = des.replaceAll("\\\\?", ""); //防止出错
         Pattern pattern = Pattern.compile(des);
         Matcher matcher = pattern.matcher(sb);
-        int count=0;
-        while(matcher.find()){
+        int count = 0;
+        while (matcher.find()) {
             count++;
         }
         return count;
@@ -205,9 +207,9 @@ public class BaiduSearch {
      */
     static class ResultSum {
         public String path; //搜索路径
-        public int sum []; //每个答案命中次数
-        public int dumpsum [][]; //每个答案中的文字出现的次数
-        public int allsum []; //单字出现次数总和
+        public int sum[]; //每个答案命中次数
+        public int dumpsum[][]; //每个答案中的文字出现的次数
+        public int allsum[]; //单字出现次数总和
 
         ResultSum(QandA qa) {
             sum = new int[qa.getAns().length];

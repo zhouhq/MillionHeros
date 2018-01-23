@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">MillionHeros</string>
-    <string name="tools_hint">精准匹配：李煜:5 ,  最大值！	 总和：20
-                                                                        ----------------------
-                                                                        分词匹配：汤:0, 显:1, 祖:0,  	  空值:2
-                                                                        分词匹配：李:15, 煜:5,  	 ###### 总和:20  	 最大值！
-                                                                        分词匹配：黄:0, 庭:0, 坚:0,  	  空值:3</string>
+    <string name="tools_hint">"移动标线确保上下两条线内只有问题与答案"</string>
+    <string name="close_line">"关闭标线"</string>
+    <string name="open_ling">"打开标线"</string>
+    <string name="exit">"退出"</string>
+    <string name="min">"最小化"</string>
+    <string name="max">"最大化"</string>
 </resources>

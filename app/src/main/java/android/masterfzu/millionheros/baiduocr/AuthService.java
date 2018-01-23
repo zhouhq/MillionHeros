@@ -1,5 +1,9 @@
 package android.masterfzu.millionheros.baiduocr;
 
+import android.content.Context;
+import android.masterfzu.millionheros.preferences.SettingPreferences;
+import android.text.TextUtils;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,18 +26,21 @@ public class AuthService {
      * "expires_in": 2592000
      * }
      */
-    public static String getAuth() {
+    public static final String APP_ID = "10703133";
+    public static final String API_KEY = "b7NfAl9GS9qp4e03sqlyiS6U";
+    public static final String SECRET_KEY = "UHOfSyRPyUTIzGfcaUcgWrKrzmwr5B1R";
+    public static String getAuth(Context context) {
         // 官网获取的 API Key 更新为你注册的
         //TODO 输入你的ID
-        String clientId = "";
+        String clientId = API_KEY;
         // 官网获取的 Secret Key 更新为你注册的
         //TODO 输入你的Secret
-        String clientSecret = "";
-        return getAuth(clientId, clientSecret);
+        String clientSecret = SECRET_KEY;
+        return getAuth(context,clientId, clientSecret);
     }
 
     public static void main(String [] args) {
-        System.out.println(getAuth());
+
     }
 
     /**
@@ -44,8 +51,9 @@ public class AuthService {
      * @return assess_token 示例：
      * "24.460da4889caad24cccdb1fea17221975.2592000.1491995545.282335-1234567"
      */
-    public static String getAuth(String ak, String sk) {
+    public static String getAuth(Context context,String ak, String sk) {
         // 获取token地址
+        long curr = System.currentTimeMillis();
         String authHost = "https://aip.baidubce.com/oauth/2.0/token?";
         String getAccessTokenUrl = authHost
                 // 1. grant_type为固定参数
@@ -79,6 +87,12 @@ public class AuthService {
             System.err.println("result:" + result);
             JSONObject jsonObject = new JSONObject(result);
             String access_token = jsonObject.getString("access_token");
+            int expires_in = jsonObject.getInt("expires_in");
+            if(TextUtils.isEmpty(access_token)) {
+                SettingPreferences.getInstance(context).setAccessToken(access_token);
+                long time = curr+expires_in*1000;
+                SettingPreferences.getInstance(context).setAccessTokenOverdue(time);
+            }
             return access_token;
         } catch (Exception e) {
             System.err.printf("获取token失败！");

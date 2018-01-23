@@ -1,6 +1,7 @@
 package android.masterfzu.millionheros;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -17,6 +18,17 @@ public class TheApp extends Application {
     private int result;
     private Intent intent;
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        app = this;
+    }
+
+    private static TheApp app;
+
+    public static Application get() {
+        return app;
+    }
     public int getResult() {
         return result;
     }

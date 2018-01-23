@@ -1,6 +1,8 @@
 package android.masterfzu.millionheros.baiduocr;
 
 import android.app.Service;
+import android.masterfzu.millionheros.TheApp;
+import android.masterfzu.millionheros.preferences.SettingPreferences;
 import android.masterfzu.millionheros.util.Counter;
 import android.os.Handler;
 import android.os.Message;
@@ -61,7 +63,7 @@ public class BaiduOCR {
              * 线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
              * TODO 输入你的accessToken
              */
-            String accessToken = "24.970ef81daa759bcb20838247cac033e7.2592000.1518747551.282335-10690761";
+            String accessToken = SettingPreferences.getInstance(TheApp.get().getApplicationContext()).getAccessToken();
             String result = HttpUtil.post(otherHost, accessToken, params);
             System.out.println(result);
 

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MillionHeros2.iml" filepath="$PROJECT_DIR$/MillionHeros2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MillionHeros.iml" filepath="$PROJECT_DIR$/.idea/MillionHeros.iml" />
+      <module fileurl="file://C:\DevWork\MillionHeros\MillionHeros2.iml" filepath="C:\DevWork\MillionHeros\MillionHeros2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

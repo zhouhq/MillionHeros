@@ -10,7 +10,9 @@ import android.hardware.display.VirtualDisplay;
 import android.masterfzu.millionheros.R;
 import android.masterfzu.millionheros.TheApp;
 import android.masterfzu.millionheros.hint.BaiduSearch;
+import android.masterfzu.millionheros.preferences.SettingPreferences;
 import android.masterfzu.millionheros.util.Counter;
+import android.masterfzu.millionheros.util.ScreenUtils;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
@@ -30,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,8 +50,8 @@ public class TouchService extends Service {
     private static final String TAG = "TouchService";
     public static final int TOUCHER_WID = 200;
     public static final int TOUCHER_HEI = 200;
-    public static int mYUPLINE = 266;
-    public static int mYDONWLINE = 1159;
+    public static int mYUPLINE = 0;
+    public static int mYDONWLINE = 0;
 
     ConstraintLayout toucherLayout;
     LinearLayout upLine, downLine;
@@ -79,6 +82,10 @@ public class TouchService extends Service {
     //状态栏高度.
     int statusBarHeight = -1;
 
+    int downX;
+    int downY;
+
+    boolean lineIsShow = true;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -88,6 +95,11 @@ public class TouchService extends Service {
         }
     };
 
+    /**各个view*/
+    Button bt_exit;
+    Button bt_start;
+    Button bt_line;
+    Button bt_min;
 
     //不与Activity进行绑定.
     @Override
@@ -95,17 +107,26 @@ public class TouchService extends Service {
         return null;
     }
 
+    SettingPreferences preferences;
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "TouchService Created");
+        int screenHeight = (int)ScreenUtils.getScreenHeight(this);
+        preferences = SettingPreferences.getInstance(this);
+
+        mYUPLINE = preferences.getYUPLine();
+        mYUPLINE =mYUPLINE<0? (int)(screenHeight*0.25f):mYUPLINE;
+
+        mYDONWLINE = preferences.getYDownLine();
+        mYDONWLINE =mYDONWLINE<0? (int)(screenHeight*0.75f):mYDONWLINE;
 
         setUpMediaProjection();
         createVirtualEnvironment();
         addUpHintLine();
         addDownHintLine();
         addHintLayout();
-        addToucher();
+        //addToucher();
     }
 
     public void setUpMediaProjection(){
@@ -199,9 +220,24 @@ public class TouchService extends Service {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    params.x = (int) event.getRawX();
-                    params.y = (int) event.getRawY() - statusBarHeight;
+                    int x = (int) event.getRawX();;
+                    int y = (int) event.getRawY() - statusBarHeight;
+                    int dx = x-downX;
+                    int dy = y-downY;
+                    if(Math.abs(dx)<20 && Math.abs(dy)<20)
+                    {
+                        return false;
+                    }
+                    downX =x;
+                    downY =y;
+                    params.x = params.x+dx;
+                    params.y = params.y+dy;
                     windowManager.updateViewLayout(toucherLayout, params);
+                    return true;
+                } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    downX = (int)event.getRawX();
+                    downY = (int)event.getRawY() - statusBarHeight;
+                    return false;
                 }
                 return false;
             }
@@ -209,8 +245,11 @@ public class TouchService extends Service {
     }
 
     private void showMe() {
+        if(lineIsShow) {
+            closeOrOpenLine();
+        }
+        //final String path = getCaptureReturnPath();
         final byte [] img = getCapture();
-
         if (img != null || img.length > 0) {
             hintView.setText("截图成功");
 //            hintView.loadData("截图成功", "text/html", "UTF-8");
@@ -231,13 +270,15 @@ public class TouchService extends Service {
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
         //设置窗口初始停靠位置.
-        params.gravity = Gravity.BOTTOM;
+        params.gravity = Gravity.BOTTOM|Gravity.LEFT;
+
 //        params.x = 0;
 //        params.y = 0;
 
         //设置悬浮窗口长宽数据.
-        params.width = windowWidth;
-        params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 500, this.getResources().getDisplayMetrics());
+        params.width = WindowManager.LayoutParams.WRAP_CONTENT;;
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        //(int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 500, this.getResources().getDisplayMetrics());
 
         LayoutInflater inflater = LayoutInflater.from(getApplication());
         //获取浮动窗口视图所在布局.
@@ -247,29 +288,43 @@ public class TouchService extends Service {
 
         hintView = hintlayout.findViewById(R.id.hintText);
 //        hintView.getSettings().setDefaultTextEncodingName("UTF-8");
-        hintlayout.setOnLongClickListener(new View.OnLongClickListener() {
+
+        bt_line =hintlayout.findViewById(R.id.add);
+        bt_line.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                stopSelf();
-                return true;
+            public void onClick(View v) {
+              closeOrOpenLine();
             }
         });
 
-        hintlayout.findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
+        bt_start = hintlayout.findViewById(R.id.start);
+        bt_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAddLine();
+                showMe();
             }
         });
-        hintlayout.findViewById(R.id.remove).setOnClickListener(new View.OnClickListener() {
+
+        bt_exit = hintlayout.findViewById(R.id.exit);
+        bt_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopSelf();
                 removeLine();
             }
         });
 
+        bt_min = hintlayout.findViewById(R.id.min);
+        bt_min.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                minOrMax();
+            }
+        });
+
+
 //        hintView.loadData("### 长按此处退出 ~ 点小猪进行提示 ### \n\n 移动标线确保上下两条线内只有问题与答案 \n 截屏前最好关闭标线", "text/html", "UTF-8");
-        hintView.setText("### 长按此处退出 ~ 点小猪进行提示 ### \n\n 移动标线确保上下两条线内只有问题与答案 \n 截屏前最好关闭标线  \n\nPS：不可能/不属于/不是的问题选无匹配的答案~~");
+        hintView.setText("移动标线确保上下两条线内只有问题与答案");
     }
 
     private void addUpHintLine() {
@@ -304,6 +359,9 @@ public class TouchService extends Service {
                     mYUPLINE = upLineP.y - statusBarHeight;
                     hintLineText.setText("------------------ " + mYUPLINE + " ------------------");
                     windowManager.updateViewLayout(upLine, upLineP);
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP ||event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    preferences.setYUPLine(mYUPLINE);
                 }
                 return false;
             }
@@ -347,6 +405,9 @@ public class TouchService extends Service {
                     mYDONWLINE = downLineP.y - statusBarHeight;
                     hintLineText.setText("------------------ " + mYDONWLINE + " ------------------");
                     windowManager.updateViewLayout(downLine, downLineP);
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP ||event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    preferences.setYDownLine(mYDONWLINE);
                 }
                 return false;
             }
@@ -464,5 +525,71 @@ public class TouchService extends Service {
         mVirtualDisplay.release();
         mVirtualDisplay = null;
         Log.i(TAG,"virtual display stopped");
+    }
+    /**
+     * 最小化或者最大体内
+     *
+     * */
+    boolean isMin = false;
+
+    private void minOrMax() {
+        if (isMin) {
+            hintView.setVisibility(View.VISIBLE);
+            bt_start.setVisibility(View.VISIBLE);
+            bt_exit.setVisibility(View.VISIBLE);
+            bt_line.setVisibility(View.VISIBLE);
+            bt_min.setText(R.string.min);
+
+        } else {
+            if (lineIsShow) {
+                closeOrOpenLine();
+            }
+            hintView.setVisibility(View.GONE);
+            bt_start.setVisibility(View.GONE);
+            bt_exit.setVisibility(View.GONE);
+            bt_line.setVisibility(View.GONE);
+            bt_min.setText(R.string.max);
+        }
+        isMin = !isMin;
+    }
+
+    private void closeOrOpenLine() {
+        if (!lineIsShow) {
+            onAddLine();
+            lineIsShow = !lineIsShow;
+            bt_line.setText(R.string.close_line);
+        } else {
+            removeLine();
+            lineIsShow = !lineIsShow;
+            bt_line.setText(R.string.open_ling);
+        }
+    }
+
+    private String getCaptureReturnPath() {
+        Counter.letsgo("startCapture");
+//        removeLine();
+
+        strDate = dateFormat.format(new java.util.Date());
+        nameImage = pathImage + File.separator + strDate + ".png";
+
+        Image image = mImageReader.acquireLatestImage();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        final Image.Plane[] planes = image.getPlanes();
+        final ByteBuffer buffer = planes[0].getBuffer();
+
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * width;
+        int hintLineHeight = this.getResources().getDimensionPixelSize(R.dimen.hint_line_height);
+        Bitmap bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride, height, Bitmap.Config.ARGB_8888);
+//        buffer.position(0);
+        bitmap.copyPixelsFromBuffer(buffer);
+        bitmap = Bitmap.createBitmap(bitmap, 0, mYUPLINE + statusBarHeight + hintLineHeight, width, mYDONWLINE - mYUPLINE - hintLineHeight);
+        image.close();
+        Log.i(TAG, "image data captured");
+        saveToSD(bitmap);
+        return nameImage;
+//        makeToast("截屏完成耗时" + Counter.spendS("startCapture") + "s，保存路径：" + fileImage.getAbsolutePath());
     }
 }
