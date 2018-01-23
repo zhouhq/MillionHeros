@@ -36,38 +36,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mMediaProjectionManager = (MediaProjectionManager) this.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-
-        //当AndroidSDK>=23及Android版本6.0及以上时，需要获取OVERLAY_PERMISSION.
-        //使用canDrawOverlays用于检查，下面为其源码。其中也提醒了需要在manifest文件中添加权限.
-        /**
-         * Checks if the specified context can draw on top of other apps. As of API
-         * level 23, an app cannot draw on top of other apps unless it declares the
-         * {@link android.Manifest.permission#SYSTEM_ALERT_WINDOW} permission in its
-         * manifest, <em>and</em> the user specifically grants the app this
-         * capability. To prompt the user to grant this approval, the app must send an
-         * intent with the action
-         * {@link android.provider.Settings#ACTION_MANAGE_OVERLAY_PERMISSION}, which
-         * causes the system to display a permission management screen.
-         *
-         */
         //if (Settings.canDrawOverlays(MainActivity.this)) {
-        startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+         startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
         // } else {
         //若没有权限，提示获取.
         //    starToOverlayPermission();
         //    finish();
         // }
-        OnResultListener<AccessToken> listener = new OnResultListener<AccessToken>() {
-            @Override
-            public void onResult(AccessToken o) {
-                Log.e("zhouhq", "初始化OCR成功");
-            }
 
-            @Override
-            public void onError(OCRError ocrError) {
-                Log.e("zhouhq", "初始化OCR失败:" + ocrError.getMessage());
-            }
-        };
         String accessToke = SettingPreferences.getInstance(this).getAccessToken();
         long time = SettingPreferences.getInstance(this).getAccessTokenOverdue();
         if (TextUtils.isEmpty(accessToke) || time < System.currentTimeMillis()) {

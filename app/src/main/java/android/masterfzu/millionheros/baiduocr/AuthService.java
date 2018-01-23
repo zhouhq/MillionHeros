@@ -3,6 +3,7 @@ package android.masterfzu.millionheros.baiduocr;
 import android.content.Context;
 import android.masterfzu.millionheros.preferences.SettingPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -88,7 +89,9 @@ public class AuthService {
             JSONObject jsonObject = new JSONObject(result);
             String access_token = jsonObject.getString("access_token");
             int expires_in = jsonObject.getInt("expires_in");
-            if(TextUtils.isEmpty(access_token)) {
+            if(!TextUtils.isEmpty(access_token)) {
+                Log.e("zhouhq","access_token = "+access_token);
+                Log.e("zhouhq","expires_in = "+expires_in);
                 SettingPreferences.getInstance(context).setAccessToken(access_token);
                 long time = curr+expires_in*1000;
                 SettingPreferences.getInstance(context).setAccessTokenOverdue(time);
