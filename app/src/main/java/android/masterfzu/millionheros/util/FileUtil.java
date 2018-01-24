@@ -1,4 +1,4 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.util;
 
 import java.io.*;
 

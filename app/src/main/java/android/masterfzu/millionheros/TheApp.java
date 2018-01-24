@@ -12,7 +12,7 @@ import android.util.Log;
 public class TheApp extends Application {
     public static final String TheAPPTAG = "MHheros";
     public static void LogW(String s) {
-        Log.w(TheAPPTAG, s);
+        Log.e(TheAPPTAG, s);
     }
 
     private int result;

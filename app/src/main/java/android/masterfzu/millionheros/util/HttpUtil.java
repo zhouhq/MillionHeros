@@ -1,4 +1,4 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.util;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,9 +22,9 @@ public class HttpUtil {
     public static String post(String requestUrl, String accessToken, String contentType, String params)
             throws Exception {
         String encoding = "UTF-8";
-        if (requestUrl.contains("nlp")) {
-            encoding = "GBK";
-        }
+       // if (requestUrl.contains("nlp")) {
+       //     encoding = "GBK";
+     //   }
         return HttpUtil.post(requestUrl, accessToken, contentType, params, encoding);
     }
 
@@ -43,6 +43,7 @@ public class HttpUtil {
         // 设置通用的请求属性
         connection.setRequestProperty("Content-Type", contentType);
         connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setRequestProperty("accept", "json");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         connection.setDoInput(true);

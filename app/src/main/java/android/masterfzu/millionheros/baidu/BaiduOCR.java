@@ -1,12 +1,13 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.baidu;
 
-import android.app.Service;
 import android.masterfzu.millionheros.TheApp;
 import android.masterfzu.millionheros.preferences.SettingPreferences;
+import android.masterfzu.millionheros.util.Base64Util;
 import android.masterfzu.millionheros.util.Counter;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
+import android.masterfzu.millionheros.util.DebugUtils;
+import android.masterfzu.millionheros.util.FileUtil;
+import android.masterfzu.millionheros.util.HttpUtil;
+import android.text.TextUtils;
 
 import java.net.URLEncoder;
 
@@ -49,10 +50,14 @@ public class BaiduOCR {
     }
 
     public static String doOCR(final byte[] imgData) {
+        if(DebugUtils.isDebug)
+        {
+            return DebugUtils.getOcrResult();
+        }
         if (imgData == null)
             return "";
 
-        Counter.spendS("doOCR");
+        Counter.letsgo(Counter.action_doOCR);
         // 通用识别url
         String otherHost = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic";
         // 本地图片路径
@@ -64,10 +69,13 @@ public class BaiduOCR {
              * TODO 输入你的accessToken
              */
             String accessToken = SettingPreferences.getInstance(TheApp.get().getApplicationContext()).getAccessToken();
+            if (TextUtils.isEmpty(accessToken)) {
+                return null;
+            }
             String result = HttpUtil.post(otherHost, accessToken, params);
             System.out.println(result);
 
-            Counter.spendS("doOCR");
+            Counter.spendS(Counter.action_doOCR);
 
             return result;
         } catch (Exception e) {

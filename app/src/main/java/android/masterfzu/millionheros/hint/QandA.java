@@ -1,6 +1,8 @@
 package android.masterfzu.millionheros.hint;
 
 import android.masterfzu.millionheros.TheApp;
+import android.masterfzu.millionheros.baidu.BaiduOCR;
+import android.masterfzu.millionheros.baidu.BaiduRpc;
 import android.masterfzu.millionheros.util.StringUtil;
 import android.util.Log;
 
@@ -17,6 +19,18 @@ import java.util.Arrays;
 public class QandA {
     private String question;
     private String [] ans = new String[3];
+
+    /**
+     * 是否是排除的问题，
+     * 如，不属于，不是，不在等等
+     * */
+    boolean isExclude = false;
+    /**
+     *是否是反相搜索，即立用答案来搜索，匹配题目
+     *
+     */
+
+    boolean reverse = true;
 
     @Override
     public String toString() {
@@ -49,7 +63,10 @@ public class QandA {
                 qsb.append(ja.getJSONObject(i).getString("words"));
 
             result.question = pureQ(qsb.toString());
+            BaiduRpc.Result r[]= BaiduRpc.doRpc(result.question);
+            result.handleRpcResult(r);
 
+            TheApp.LogW("rpc="+r);
             TheApp.LogW(result.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,9 +80,10 @@ public class QandA {
         String result = s;
 
         if ((isNum(s.charAt(0)) && s.charAt(1) == '.'))
-            result = s.substring(3);
+            result = s.substring(2);
         else if (isNum(s.charAt(1)) && s.charAt(2) == '.')
-            result = s.substring(4);
+            result = s.substring(3);
+
 
 //        if (s.indexOf("?") == -1)
 //            return s;
@@ -97,7 +115,34 @@ public class QandA {
         return question;
     }
 
+    /**
+     * 获取搜索的关键字
+     */
+    public String getSearchKey()
+    {
+        return question;
+    }
+
+    public boolean answerRelateQuestion() {
+        return false;
+    }
+
     public String[] getAns() {
         return ans;
+    }
+
+    private void handleRpcResult(BaiduRpc.Result result[]) {
+        for (int i = 0; i < result.length; i++) {
+            BaiduRpc.Result item = result[i];
+
+            if ("不是".equals(item.word) && "v".equals(item.type)) {
+                //含有“不”并是的动词
+                isExclude = true;
+            } else if ("不".equals(item.word) && "d".equals(item.type)) {
+                //含有“不”并且是副词
+                isExclude = true;
+            }
+
+        }
     }
 }

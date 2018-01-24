@@ -9,9 +9,10 @@ import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.masterfzu.millionheros.R;
 import android.masterfzu.millionheros.TheApp;
-import android.masterfzu.millionheros.hint.BaiduSearch;
+import android.masterfzu.millionheros.hint.SolveQuestion;
 import android.masterfzu.millionheros.preferences.SettingPreferences;
 import android.masterfzu.millionheros.util.Counter;
+import android.masterfzu.millionheros.util.DebugUtils;
 import android.masterfzu.millionheros.util.ScreenUtils;
 import android.media.Image;
 import android.media.ImageReader;
@@ -24,9 +25,10 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -90,7 +92,8 @@ public class TouchService extends Service {
         @Override
         public void handleMessage(Message msg) {
             String result = msg.getData().getString("result");
-            hintView.setText(result);
+            Spanned html=Html.fromHtml(result);
+            hintView.setText(html);
 //            hintView.loadData(result, "text/html; charset=UTF-8", null);
         }
     };
@@ -126,6 +129,7 @@ public class TouchService extends Service {
         addUpHintLine();
         addDownHintLine();
         addHintLayout();
+
         //addToucher();
     }
 
@@ -249,11 +253,13 @@ public class TouchService extends Service {
             closeOrOpenLine();
         }
         //final String path = getCaptureReturnPath();
+        Counter.letsgo(Counter.action_startCapture);
         final byte [] img = getCapture();
+        Counter.spendS(Counter.action_startCapture);
         if (img != null || img.length > 0) {
             hintView.setText("截图成功");
 //            hintView.loadData("截图成功", "text/html", "UTF-8");
-            BaiduSearch.search(img, mHandler);
+            SolveQuestion.search(img, mHandler);
         } else
             hintView.setText("!!!!!!截图失败，马上重试!!!!!!!");
 //        hintView.loadData("!!!!!!截图失败，马上重试!!!!!!!", "text/html", "UTF-8");
@@ -416,9 +422,8 @@ public class TouchService extends Service {
 
 
     private byte[] getCapture() {
-        Counter.letsgo("startCapture");
 //        removeLine();
-
+        if(DebugUtils.isDebug)return new byte[2];
         strDate = dateFormat.format(new java.util.Date());
         nameImage = pathImage + File.separator + strDate + ".png";
 
@@ -566,9 +571,6 @@ public class TouchService extends Service {
     }
 
     private String getCaptureReturnPath() {
-        Counter.letsgo("startCapture");
-//        removeLine();
-
         strDate = dateFormat.format(new java.util.Date());
         nameImage = pathImage + File.separator + strDate + ".png";
 

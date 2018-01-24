@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.masterfzu.millionheros.TheApp;
-import android.masterfzu.millionheros.baiduocr.AuthService;
+import android.masterfzu.millionheros.baidu.AuthService;
 import android.masterfzu.millionheros.preferences.SettingPreferences;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
@@ -13,11 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.baidu.ocr.sdk.OCR;
-import com.baidu.ocr.sdk.OnResultListener;
-import com.baidu.ocr.sdk.exception.OCRError;
-import com.baidu.ocr.sdk.model.AccessToken;
 
 /**
  * 获取截屏与悬浮窗权限

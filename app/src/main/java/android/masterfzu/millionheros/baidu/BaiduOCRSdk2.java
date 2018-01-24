@@ -1,6 +1,5 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.baidu;
 
-import android.masterfzu.millionheros.util.Counter;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -50,16 +49,10 @@ public class BaiduOCRSdk2 {
 
 
     public static void doOCR(String filePath, final ServiceResult listen) {
-
-
-
             result = null;
             if (TextUtils.isEmpty(filePath)) {
                 return;
             }
-
-            Counter.spendS("doOCR");
-
             // 本地图片路径
             try {
 
@@ -83,8 +76,6 @@ public class BaiduOCRSdk2 {
                 param.setImageFile(new File(filePath));
 
                 OCR.getInstance().recognizeGeneralBasic(param, listener1);
-                Counter.spendS("doOCR");
-
             } catch (Exception e) {
                 e.printStackTrace();
                 listen.OnResult("");

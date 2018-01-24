@@ -1,4 +1,4 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.util;
 
 /**
  * Base64 工具类

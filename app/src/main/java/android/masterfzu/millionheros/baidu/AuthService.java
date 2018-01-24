@@ -1,4 +1,4 @@
-package android.masterfzu.millionheros.baiduocr;
+package android.masterfzu.millionheros.baidu;
 
 import android.content.Context;
 import android.masterfzu.millionheros.preferences.SettingPreferences;
