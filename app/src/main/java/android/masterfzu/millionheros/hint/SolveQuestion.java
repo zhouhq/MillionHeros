@@ -66,7 +66,7 @@ public class SolveQuestion {
 
 
     private final  static String html_f="<font color=\"#ff0000\">";
-    private final  static String html_b="</font>";
+    private final  static String html_font ="</font>";
     private final  static String html_br="<br/>";
     static String prettyOut(QandA qa, ResultSum r) {
         StringBuffer rsb = new StringBuffer();
@@ -92,9 +92,9 @@ public class SolveQuestion {
 
                 System.out.println("命中：" + qa.getAns()[i] + ":" + r.sum[i] + (index == i ? " ,  最多！" : "") + "\t 总和：" + r.allsum[i]);
                 if (r.sum[i] == max) {
-                    rsb.append(html_f+"正确：" + qa.getAns()[i] + " : " + r.sum[i]+html_b+html_br);
+                    rsb.append(html_f+"正确：" + qa.getAns()[i] + " : " + r.sum[i]+ html_font);
                 } else {
-                    rsb.append("错误：" + qa.getAns()[i] + " : " + r.sum[i]+html_br);
+                    rsb.append("错误：" + qa.getAns()[i] + " : " + r.sum[i]);
                 }
                 rsb.append(html_br);
             }

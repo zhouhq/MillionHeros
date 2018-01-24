@@ -18,16 +18,16 @@ import java.util.Arrays;
  */
 public class QandA {
     private String question;
-    private String [] ans = new String[3];
+    private BaiduRpc.Result questionRpc;
+    private String[] ans = new String[3];
 
     /**
      * 是否是排除的问题，
      * 如，不属于，不是，不在等等
-     * */
+     */
     boolean isExclude = false;
     /**
-     *是否是反相搜索，即立用答案来搜索，匹配题目
-     *
+     * 是否是反相搜索，即立用答案来搜索，匹配题目
      */
 
     boolean reverse = true;
@@ -63,10 +63,10 @@ public class QandA {
                 qsb.append(ja.getJSONObject(i).getString("words"));
 
             result.question = pureQ(qsb.toString());
-            BaiduRpc.Result r[]= BaiduRpc.doRpc(result.question);
+            BaiduRpc.Result r = BaiduRpc.doRpc(result.question);
             result.handleRpcResult(r);
 
-            TheApp.LogW("rpc="+r);
+            TheApp.LogW("rpc=" + r);
             TheApp.LogW(result.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,7 +92,7 @@ public class QandA {
     }
 
     private static boolean isNum(char c) {
-        if (c >='0'&& c <='9')
+        if (c >= '0' && c <= '9')
             return true;
 
         return false;
@@ -106,7 +106,7 @@ public class QandA {
         return result;
     }
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         String result = "{\"log_id\": 8816071367637002938, \"words_result_num\": 5, \"words_result\": [{\"words\": \"《火星情报局》第三季主题\"}, {\"words\": \"曲是?\"}, {\"words\": \"《再见18岁》\"}, {\"words\": \"《火星人来过》\"}, {\"words\": \"《火星情报局》\"}]}";
         QandA.format(result);
     }
@@ -115,11 +115,14 @@ public class QandA {
         return question;
     }
 
+    public BaiduRpc.Result getQuestionRpc() {
+        return questionRpc;
+    }
+
     /**
      * 获取搜索的关键字
      */
-    public String getSearchKey()
-    {
+    public String getSearchKey() {
         return question;
     }
 
@@ -131,14 +134,15 @@ public class QandA {
         return ans;
     }
 
-    private void handleRpcResult(BaiduRpc.Result result[]) {
-        for (int i = 0; i < result.length; i++) {
-            BaiduRpc.Result item = result[i];
+    private void handleRpcResult(BaiduRpc.Result result) {
+        questionRpc = result;
+        for (int i = 0; i < result.size; i++) {
 
-            if ("不是".equals(item.word) && "v".equals(item.type)) {
+
+            if ("不是".equals(result.getWord(i)) && "v".equals(result.getType(i))) {
                 //含有“不”并是的动词
                 isExclude = true;
-            } else if ("不".equals(item.word) && "d".equals(item.type)) {
+            } else if ("不".equals(result.getWord(i)) && "d".equals(result.getType(i))) {
                 //含有“不”并且是副词
                 isExclude = true;
             }

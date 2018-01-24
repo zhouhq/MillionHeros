@@ -25,10 +25,10 @@ public class DebugUtils {
 
         StringBuffer buffer=new StringBuffer();
 
-        String question=("9.下列说法正确的是？");
-        String as1="钨丝灯发光时不会发热";
-        String as2 ="电流的单位是立方米";
-        String as3="食用盐的主要是氯化钠";
+        String question=("9.下列哪位歌手是男性？");
+        String as1="张碧晨";
+        String as2 ="张学友";
+        String as3="邓紫棋";
 
        String re=String.format(result,question,as1,as2,as3);
         return re;
